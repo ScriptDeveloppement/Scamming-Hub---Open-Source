@@ -16,6 +16,10 @@ Section:NewButton("Legends of Speed", "", function()
       loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDeveloppement/Scamming-Hub---Open-Source/refs/heads/main/Legends%20of%20Speed.lua"))()
   end)
 
+Section:NewButton("Legends of Speed", "", function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDeveloppement/Scamming-Hub---Open-Source/refs/heads/main/Muscle%20Legends.lua"))()
+  end)
+
 Section:NewButton("Ninja Legends", "", function()
       loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDeveloppement/Scamming-Hub---Open-Source/refs/heads/main/Ninja%20Legends.lua"))()
   end)
