@@ -82,6 +82,7 @@ local function PepperAura()
     end
 end
 
+
 local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Orion/main/source'))()
 
 -- Create Orion Window
@@ -126,17 +127,19 @@ local Settings = {
     NoRagdoll = false,
     NoClipEnabled = false,
     NoFlashbang = false,
-    NoSmoke = false,
-    NoFailLockpick = false,
-    FullBright = false,
-    Viewmodel = {
-        Enabled = true,
-        ArmsColor = Color3.fromRGB(255, 255, 255),
-        ArmsMaterial = "ForceField",
-        ToolColor = Color3.fromRGB(255, 255, 255),
-        ToolMaterial = "Plastic"
-    }
-}
+NoSmoke = false,
+NoFailLockpick = false,
+FullBright = false,
+Enabled = false,
+InfiniteSpray = false,
+Range = 10,
+Viewmodel = {
+    Enabled = true,
+    ArmsColor = Color3.fromRGB(255, 255, 255),
+    ArmsMaterial = "ForceField",
+    ToolColor = Color3.fromRGB(255, 255, 255),
+    ToolMaterial = "Plastic"
+}}
 
 GunModsTab:AddToggle({
     Name = "No Recoil",
@@ -151,9 +154,12 @@ GunModsTab:AddToggle({
                 end
             end
         end)
-        if not success then warn("Error in No Recoil: " .. err) end
+        if not success then
+            warn("Error in No Recoil: " .. err)
+        end
     end
 })
+
 
 GunModsTab:AddToggle({
     Name = "Instant Equip",
@@ -216,6 +222,37 @@ GunModsTab:AddToggle({
 local PepperSpraySection = GunModsTab:AddSection({
 	Name = "Pepper Spray"
 })
+
+local function HandlePepperSprayAura()
+    game:GetService("RunService").RenderStepped:Connect(function()
+        wait(1)
+        if PepperSpray.Enabled and game.Players.LocalPlayer.Character:FindFirstChild("Pepper-spray") then
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < PepperSpray.Range then
+                        game.Players.LocalPlayer.Character["Pepper-spray"].RemoteEvent:FireServer("Spray", true)
+                        game.Players.LocalPlayer.Character["Pepper-spray"].RemoteEvent:FireServer("Hit", v.Character)
+                    else
+                        game.Players.LocalPlayer.Character["Pepper-spray"].RemoteEvent:FireServer("Spray", false)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+
+HandlePepperSprayAura()
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    wait(1)
+    if PepperSpray.InfiniteSpray and game.Players.LocalPlayer.Character:FindFirstChild("Pepper-spray") then
+        game.Players.LocalPlayer.Character["Pepper-spray"].Ammo.Value = 99
+        game.Players.LocalPlayer.Character["Pepper-spray"].RemoteEvent:FireServer("Update", 99)
+    end
+end)
+
 
 
 GunModsTab:AddToggle({
@@ -462,21 +499,6 @@ LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
         end
     end
 end)
-
--- FullBright
-RunService.Heartbeat:Connect(function()
-    Lighting.Brightness = Settings.FullBright and 2 or 1
-    Lighting.FogEnd = Settings.FullBright and 100000 or 1000
-end)
-
-VisualTab:AddToggle({
-    Name = "FullBright",
-    Default = false,
-    Callback = function(Value)
-        Settings.FullBright = Value
-    end
-})
-
 PlayerTab:AddToggle({
     Name = "No Flashbang",
     Default = false,
