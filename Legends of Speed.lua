@@ -19,6 +19,12 @@ local Pets = Window:MakeTab({
 	PremiumOnly = false
 })
 
+local Trails = Window:MakeTab({
+	Name = "Trails",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
 local Crystals = Window:MakeTab({
 	Name = "Crystals",
 	Icon = "rbxassetid://4483345998",
@@ -194,6 +200,26 @@ local ohString1 = "collectOrb"
 local ohString2 = "Infernal Gem"
 local ohString3 = "City"
 
+Farm:AddToggle({ 
+    Name = "Gem Farm (MAX STRENGH)", 
+    Default = false,
+    Callback = function(Value)
+        GemFarmEnabled = Value
+
+        if GemFarmEnabled then
+            spawn(function()
+                while GemFarmEnabled do
+                    for i = 1, 1000 do
+                        game:GetService("ReplicatedStorage").rEvents.orbEvent:FireServer(ohString1, ohString2, ohString3)
+                    end
+                    
+                    wait(0.1)
+                end
+            end)
+        end
+    end    
+})
+
 local AutoRebirthEnabled = false
 local ohString1 = "rebirthRequest"
 
@@ -257,11 +283,89 @@ local crystalNames = {
     "Jungle Crystal"
 }
 
+local trailNames = {
+    "Red Trail",
+    "Blue Trail",
+    "Green Trail",
+    "Purple Trail",
+    "Orange Trail",
+    "Pink Trail",
+    "Yellow Trail",
+    "Red & Blue",
+    "Green & Orange",
+    "Purple & Pink",
+    "Yellow & Blue",
+    "Blue & Green",
+    "Orange Snow",
+    "Blue Snow",
+    "Green Snow",
+    "White Snow",
+    "Red Snow",
+    "Pink Snow",
+    "Fifth Trail",
+    "Red Sparks",
+    "Blue Sparks",
+    "Green Sparks",
+    "Pink Sparks",
+    "Yellow Sparks",
+    "Blue Storm",
+    "Green Storm",
+    "Purple Storm",
+    "Red Storm",
+    "Orange Storm",
+    "Pink Storm",
+    "Blue Coin",
+    "Purple Coin",
+    "Red Coin",
+    "Green Coin",
+    "Orange Coin",
+    "Fourth Trail",
+    "Red Soul",
+    "Blue Soul",
+    "Green Soul",
+    "Orange Soul",
+    "Purple Soul",
+    "Pink Soul",
+    "Yellow Soul",
+    "Blue Lightning",
+    "Green Lightning",
+    "Purple Lightning",
+    "Orange Lightning",
+    "Golden Lightning",
+    "Red Lightning",
+    "Pink Lightning",
+    "Rainbow Trail",
+    "Third Trail",
+    "Rainbow Soul",
+    "Rainbow Sparks",
+    "Rainbow Storm",
+    "Rainbow Lightning",
+    "Purple Gem",
+    "Green Gem",
+    "Red Gem",
+    "Blue Gem",
+    "Orange Gem",
+    "Pink Gem",
+    "RB Speed",
+    "OG Speed",
+    "PP Speed",
+    "BG Speed",
+    "YB Speed",
+    "2nd Trail",
+    "Rainbow Speed",
+    "1st Trail",
+    "Dragon Fire",
+    "Hyperblast"
+}
+
 local selectedPet = ""
 local selectedCrystal = ""
+local selectedTrail = ""
 
 local autoDupe = false
 local autoBuyCrystal = false
+local autoTrail = false
+
 
 Crystals:AddDropdown({
     Name = "Dropdown",
@@ -354,6 +458,60 @@ Pets:AddToggle({
                     if ohInstance1 then
                         game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(ohInstance1)
                         print("Mass duping pet: " .. selectedPet)
+                    end
+                end
+                wait(0.1)
+            end
+        else
+            print("Mass dupe disabled.")
+        end
+    end    
+})
+
+-- Add the dropdown for selecting a trail
+Trails:AddDropdown({
+    Name = "Dropdown",
+    Default = "Pick the pet you wish to dupe",
+    Options = trailNames,  -- assuming trailNames is defined somewhere
+    Callback = function(Value)
+        selectedTrail = Value  -- Ensure we store the selected trail correctly
+        print("Selected pet: " .. selectedTrail)
+    end    
+})
+
+-- Add the button for duplicating the selected trail
+Trails:AddButton({
+    Name = "Dupe Trail",
+    Callback = function()
+        if selectedTrail == "" then  -- Check for an empty selectedTrail, not selectedPet
+            print("No trail selected!")
+            return
+        end
+
+        local ohInstance1 = game:GetService("ReplicatedStorage").cPetShopFolder[selectedTrail]
+        
+        if ohInstance1 then
+            game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(ohInstance1)
+            print("Dupe Pet button pressed for: " .. selectedTrail)
+        else
+            print("Pet not found in trail Shop folder.")
+        end
+    end    
+})
+
+-- Add the toggle for mass duplication
+Trails:AddToggle({
+    Name = "Mass Dupe",
+    Default = false,
+    Callback = function(Value)
+        autoDupe = Value
+        if autoDupe then
+            while autoDupe do
+                if selectedTrail ~= "" then  -- Check for selectedTrail instead of selectedPet
+                    local ohInstance1 = game:GetService("ReplicatedStorage").cPetShopFolder[selectedTrail]
+                    if ohInstance1 then
+                        game:GetService("ReplicatedStorage").cPetShopRemote:InvokeServer(ohInstance1)
+                        print("Mass duping trail: " .. selectedTrail)
                     end
                 end
                 wait(0.1)
